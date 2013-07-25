@@ -9,8 +9,8 @@ DBBeagleApplication::DBBeagleApplication(int& argc, char** argv) :
 
 DBBeagleApplication::~DBBeagleApplication()
 {
-    if(pDB.get())
-        pDB->close();
+    if(pDb.get())
+        pDb->close();
 }
 
 DBBeagleApplication* DBBeagleApplication::instance()
@@ -23,7 +23,7 @@ void DBBeagleApplication::initialize()
     setOrganizationName("DBBeagle");
     setApplicationName("DBBeagle");
 
-    instance()->pDB.reset(new QSqlDatabase(QSqlDatabase::addDatabase(dbDriver())));
+    instance()->pDb.reset(new QSqlDatabase(QSqlDatabase::addDatabase(dbDriver())));
 }
 
 QString DBBeagleApplication::dbDriver()

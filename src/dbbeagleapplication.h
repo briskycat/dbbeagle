@@ -20,7 +20,7 @@ public:
 signals:
 
 public:
-    std::auto_ptr<QSqlDatabase> pDB;
+    std::auto_ptr<QSqlDatabase> pDb;
 
 public slots:
 

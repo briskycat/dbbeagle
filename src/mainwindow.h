@@ -60,7 +60,7 @@ public:
     QList< QPair<QString, QStringList> > list() const;
 
 private:
-    QList< QPair<QString, QStringList> > listOfPairs;
+    QList< QPair<QString, QStringList> > listOfSearchResults;
 };
 
 

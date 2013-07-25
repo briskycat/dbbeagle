@@ -9,22 +9,22 @@
 
 int main(int argc, char *argv[])
 {
-    DBBeagleApplication a(argc, argv);
+    DBBeagleApplication app(argc, argv);
 
     QTranslator qtTranslator;
     qtTranslator.load("qt_" + QLocale::system().name(),
                       QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-    a.installTranslator(&qtTranslator);
+    app.installTranslator(&qtTranslator);
 
     QTranslator appTranslator;
     appTranslator.load("dbbeagle_" + QLocale::system().name());
-    a.installTranslator(&appTranslator);
+    app.installTranslator(&appTranslator);
 
     if(!QSqlDatabase::drivers().contains(DBBeagleApplication::dbDriver()))
     {
         QMessageBox::critical(0,
                              DBBeagleApplication::tr("Initialization Error"),
-                             DBBeagleApplication::tr("Database driver '%1' is not available").arg(DBBeagleApplication::dbDriver())
+                             DBBeagleApplication::tr("The database driver '%1' is not available").arg(DBBeagleApplication::dbDriver())
                              );
         return EXIT_FAILURE;
     }
@@ -34,5 +34,5 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
-    return a.exec();
+    return app.exec();
 }

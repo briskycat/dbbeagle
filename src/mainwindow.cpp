@@ -67,9 +67,9 @@ void MainWindow::changeEvent(QEvent *e)
 
 void MainWindow::connectToDB_()
 {
-    if (DBBeagleApplication::instance()->pDB->isOpen())
+    if (DBBeagleApplication::instance()->pDb->isOpen())
     {
-        DBBeagleApplication::instance()->pDB->close();
+        DBBeagleApplication::instance()->pDb->close();
         updateConnectionStatus_();
     }
 
@@ -78,19 +78,19 @@ void MainWindow::connectToDB_()
 
     if(dbDlg.exec() == QDialog::Accepted)
     {
-        DBBeagleApplication::instance()->pDB->setHostName(dbDlg.getHost());
-        DBBeagleApplication::instance()->pDB->setDatabaseName(dbDlg.getDatabase());
-        DBBeagleApplication::instance()->pDB->setUserName(dbDlg.getUser());
-        DBBeagleApplication::instance()->pDB->setPassword(dbDlg.getPassword());
+        DBBeagleApplication::instance()->pDb->setHostName(dbDlg.getHost());
+        DBBeagleApplication::instance()->pDb->setDatabaseName(dbDlg.getDatabase());
+        DBBeagleApplication::instance()->pDb->setUserName(dbDlg.getUser());
+        DBBeagleApplication::instance()->pDb->setPassword(dbDlg.getPassword());
 
-        bool ok = DBBeagleApplication::instance()->pDB->open();
+        bool ok = DBBeagleApplication::instance()->pDb->open();
         if(!ok)
         {
             QMessageBox::warning(this,
                                  tr("Connection Error"),
-                                 tr("Could not connect to datasource.\nReason: \"%1\".").arg(DBBeagleApplication::instance()->pDB->lastError().text())
+                                 tr("Could not connect to the datasource.\nThe reason was: \"%1\".").arg(DBBeagleApplication::instance()->pDb->lastError().text())
                                  );
-            Ui_MainWindow::statusBar->showMessage(DBBeagleApplication::instance()->pDB->lastError().text());
+            Ui_MainWindow::statusBar->showMessage(DBBeagleApplication::instance()->pDb->lastError().text());
         }
         else
         {
@@ -104,7 +104,7 @@ void MainWindow::connectToDB_()
 
 void MainWindow::updateConnectionStatus_()
 {
-    bool dbOpen = DBBeagleApplication::instance()->pDB->isOpen();
+    bool dbOpen = DBBeagleApplication::instance()->pDb->isOpen();
     for (int i = 0; i < searchControlsLayout->count(); ++i)
     {
         QWidget* w = searchControlsLayout->itemAt(i)->widget();
@@ -140,7 +140,7 @@ void MainWindow::search_()
     }
 
     QSet<QString> availableTables;
-    foreach (QString str, DBBeagleApplication::instance()->pDB->tables())
+    foreach (QString str, DBBeagleApplication::instance()->pDb->tables())
         availableTables.insert(str.toLower());
 
 
@@ -218,14 +218,14 @@ void MainWindow::search_()
             break;
         searchCount++;
 
-        QString query = QString("select * from %1").arg(curTable);
-        QSqlQuery q(QString(query + " limit 0"), *(DBBeagleApplication::instance()->pDB.get()));
-        q.setForwardOnly(true);
-        QSqlRecord rec = q.record();
+        QString queryStr = QString("select * from %1").arg(curTable);
+        QSqlQuery sqlQuery(QString(queryStr + " limit 0"), *(DBBeagleApplication::instance()->pDb.get()));
+        sqlQuery.setForwardOnly(true);
+        QSqlRecord rec = sqlQuery.record();
         if (rec.isEmpty())
         {
             qDebug() << tr("Encountered a record with no fields.");
-            qDebug() << tr("query was '%1'").arg(q.lastQuery());
+            qDebug() << tr("the query was '%1'").arg(sqlQuery.lastQuery());
             continue;
         }
 
@@ -248,38 +248,38 @@ void MainWindow::search_()
             continue;
         }
 
-        query += QString(" where %1=?").arg(rec.fieldName(0));
+        queryStr += QString(" where %1=?").arg(rec.fieldName(0));
         for (int i = 1; i < rec.count(); i++)
         {
-            query += QString(" or %1=?").arg(rec.fieldName(i));
+            queryStr += QString(" or %1=?").arg(rec.fieldName(i));
         }
-        query += " limit 1";
+        queryStr += " limit 1";
 
-        if(!q.prepare(query))
+        if(!sqlQuery.prepare(queryStr))
         {
-            qDebug() << tr("Failed to prepare query '%1'.").arg(query);
-            qDebug() << q.lastError();
+            qDebug() << tr("Failed to prepare the query '%1'.").arg(queryStr);
+            qDebug() << sqlQuery.lastError();
             continue;
         }
 
         for (int i = 0; i < rec.count(); i++)
         {
-            q.bindValue(i, QVariant(valueLineEdit->text()));
+            sqlQuery.bindValue(i, QVariant(valueLineEdit->text()));
         }
 
-        if (!q.exec())
-            qDebug() << tr("Failed to execute query '%1'.").arg(q.lastQuery());
-            qDebug() << q.lastError();
+        if (!sqlQuery.exec())
+            qDebug() << tr("Failed to execute the query '%1'.").arg(sqlQuery.lastQuery());
+            qDebug() << sqlQuery.lastError();
 
-        if (q.next())
+        if (sqlQuery.next())
         {
             qDebug() << tr("Found %1 in %2").arg(valueLineEdit->text(), curTable);
 
-            QSqlRecord	rec = q.record();
+            QSqlRecord	rec = sqlQuery.record();
             QStringList columns;
             for (int i = 0 ; i < rec.count(); i++)
             {
-                if(q.value(i) == QVariant(valueLineEdit->text()))
+                if(sqlQuery.value(i) == QVariant(valueLineEdit->text()))
                     columns.push_back(rec.fieldName(i));
             }
             searchResults->addResult(QPair<QString, QStringList>(curTable, columns));
@@ -306,12 +306,12 @@ void MainWindow::resultsItemActivated_( const QModelIndex& index )
 
 void MainWindow::executeQuery_()
 {
-    sqlQueryModel->setQuery(queryLineEdit->text(), *(DBBeagleApplication::instance()->pDB.get()));
+    sqlQueryModel->setQuery(queryLineEdit->text(), *(DBBeagleApplication::instance()->pDb.get()));
     if (sqlQueryModel->lastError().isValid())
     {
         QMessageBox::warning(this,
                              tr("SQL Query"),
-                             tr("Error while executing query:\n'%1'.").arg(sqlQueryModel->lastError().text())
+                             tr("Error while executing the query:\n'%1'.").arg(sqlQueryModel->lastError().text())
                              );
         Ui_MainWindow::statusBar->showMessage(sqlQueryModel->lastError().text());
     }
@@ -366,7 +366,7 @@ SearchResultsTableModel::SearchResultsTableModel(QObject *parent) : QAbstractTab
 int SearchResultsTableModel::rowCount(const QModelIndex &index) const
 {
     Q_UNUSED(index);
-    return listOfPairs.size();
+    return listOfSearchResults.size();
 }
 
 int SearchResultsTableModel::columnCount(const QModelIndex &index) const
@@ -380,11 +380,11 @@ QVariant SearchResultsTableModel::data(const QModelIndex &index, int role) const
     if (!index.isValid())
         return QVariant();
 
-    if (index.row() >= listOfPairs.size() || index.row() < 0)
+    if (index.row() >= listOfSearchResults.size() || index.row() < 0)
         return QVariant();
 
     if (role == Qt::DisplayRole) {
-        QPair<QString, QStringList> pair = listOfPairs.at(index.row());
+        QPair<QString, QStringList> pair = listOfSearchResults.at(index.row());
 
         if (index.column() == 0)
             return pair.first;
@@ -416,15 +416,15 @@ QVariant SearchResultsTableModel::headerData(int section, Qt::Orientation orient
 
 void SearchResultsTableModel::addResult(const QPair<QString, QStringList>& r)
 {
-    beginInsertRows(QModelIndex(), listOfPairs.count(), listOfPairs.count());
-    listOfPairs.push_back(r);
+    beginInsertRows(QModelIndex(), listOfSearchResults.count(), listOfSearchResults.count());
+    listOfSearchResults.push_back(r);
     endInsertRows();
 }
 
 void SearchResultsTableModel::clearResults()
 {
-    beginRemoveRows(QModelIndex(), 0, listOfPairs.count());
-    listOfPairs.clear();
+    beginRemoveRows(QModelIndex(), 0, listOfSearchResults.count());
+    listOfSearchResults.clear();
     endRemoveRows();
 }
 
@@ -435,10 +435,10 @@ QPair<QString, QStringList> SearchResultsTableModel::rowAt(const QModelIndex &in
     if (!index.isValid())
         return result;
 
-    if (index.row() >= listOfPairs.size() || index.row() < 0)
+    if (index.row() >= listOfSearchResults.size() || index.row() < 0)
         return result;
 
-    result = listOfPairs.at(index.row());
+    result = listOfSearchResults.at(index.row());
 
     return result;
 }
@@ -447,7 +447,7 @@ QList< QPair<QString, QStringList> > SearchResultsTableModel::list() const
 {
     QList< QPair<QString, QStringList> > result;
 
-    result = listOfPairs;
+    result = listOfSearchResults;
 
     return result;
 }
