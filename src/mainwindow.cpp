@@ -23,13 +23,15 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     setupUi(this);
 
-    searchResults = new SearchResultsTableModel(this);
+    sqlDialectAdaptor_.reset(new OraSQLDialectAdaptor());
 
-    sortProxyModel = new QSortFilterProxyModel(this);
-    sortProxyModel->setSourceModel(searchResults);
-    sortProxyModel->setDynamicSortFilter(true);
+    searchResults_ = new SearchResultsTableModel(this);
 
-    searchResultsTableView->setModel(sortProxyModel);
+    sortProxyModel_ = new QSortFilterProxyModel(this);
+    sortProxyModel_->setSourceModel(searchResults_);
+    sortProxyModel_->setDynamicSortFilter(true);
+
+    searchResultsTableView->setModel(sortProxyModel_);
     searchResultsTableView->setSortingEnabled(true);
     searchResultsTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     searchResultsTableView->horizontalHeader()->setStretchLastSection(true);
@@ -37,8 +39,8 @@ MainWindow::MainWindow(QWidget *parent) :
     searchResultsTableView->setSelectionMode(QAbstractItemView::SingleSelection);
     searchResultsTableView->installEventFilter(this);
 
-    sqlQueryModel = new QSqlQueryModel(this);
-    queryTableView->setModel(sqlQueryModel);
+    sqlQueryModel_ = new QSqlQueryModel(this);
+    queryTableView->setModel(sqlQueryModel_);
     queryTableView->installEventFilter(this);
 
     connect(exitAction, SIGNAL(triggered()), SLOT(close()));
@@ -206,7 +208,7 @@ void MainWindow::search_()
         return;
     }
 
-    searchResults->clearResults();
+    searchResults_->clearResults();
 
     QProgressDialog progress(tr("Searching..."), tr("Abort Search"), 0, tablesToSearch.count(), this);
     progress.setWindowModality(Qt::WindowModal);
@@ -219,7 +221,7 @@ void MainWindow::search_()
         searchCount++;
 
         QString queryStr = QString("select * from %1").arg(curTable);
-        QSqlQuery sqlQuery(QString(queryStr + " limit 0"), *(DBBeagleApplication::instance()->pDb.get()));
+        QSqlQuery sqlQuery(sqlDialectAdaptor_->addSQLLimitClause(queryStr, 0), *(DBBeagleApplication::instance()->pDb.get()));
         sqlQuery.setForwardOnly(true);
         QSqlRecord rec = sqlQuery.record();
         if (rec.isEmpty())
@@ -253,7 +255,7 @@ void MainWindow::search_()
         {
             queryStr += QString(" or %1=?").arg(rec.fieldName(i));
         }
-        queryStr += " limit 1";
+        queryStr = sqlDialectAdaptor_->addSQLLimitClause(queryStr, 1);
 
         if(!sqlQuery.prepare(queryStr))
         {
@@ -282,7 +284,7 @@ void MainWindow::search_()
                 if(sqlQuery.value(i) == QVariant(valueLineEdit->text()))
                     columns.push_back(rec.fieldName(i));
             }
-            searchResults->addResult(QPair<QString, QStringList>(curTable, columns));
+            searchResults_->addResult(QPair<QString, QStringList>(curTable, columns));
         }
 
     }
@@ -292,7 +294,7 @@ void MainWindow::search_()
 
 void MainWindow::resultsItemActivated_( const QModelIndex& index )
 {
-    QPair<QString, QStringList> p = searchResults->rowAt(
+    QPair<QString, QStringList> p = searchResults_->rowAt(
             dynamic_cast<QAbstractProxyModel*>(searchResultsTableView->model())->mapToSource(index)
             );
     QString query = QString("select * from %1").arg(p.first);
@@ -306,21 +308,21 @@ void MainWindow::resultsItemActivated_( const QModelIndex& index )
 
 void MainWindow::executeQuery_()
 {
-    sqlQueryModel->setQuery(queryLineEdit->text(), *(DBBeagleApplication::instance()->pDb.get()));
-    if (sqlQueryModel->lastError().isValid())
+    sqlQueryModel_->setQuery(queryLineEdit->text(), *(DBBeagleApplication::instance()->pDb.get()));
+    if (sqlQueryModel_->lastError().isValid())
     {
         QMessageBox::warning(this,
                              tr("SQL Query"),
-                             tr("Error while executing the query:\n'%1'.").arg(sqlQueryModel->lastError().text())
+                             tr("Error while executing the query:\n'%1'.").arg(sqlQueryModel_->lastError().text())
                              );
-        Ui_MainWindow::statusBar->showMessage(sqlQueryModel->lastError().text());
+        Ui_MainWindow::statusBar->showMessage(sqlQueryModel_->lastError().text());
     }
 }
 
 void MainWindow::copyTableNamesFromResults_()
 {
     QStringList l;
-    QList< QPair<QString, QStringList> > rl = searchResults->list();
+    QList< QPair<QString, QStringList> > rl = searchResults_->list();
     QPair<QString, QStringList>  p;
     foreach (p, rl)
         l.append(p.first);
@@ -366,7 +368,7 @@ SearchResultsTableModel::SearchResultsTableModel(QObject *parent) : QAbstractTab
 int SearchResultsTableModel::rowCount(const QModelIndex &index) const
 {
     Q_UNUSED(index);
-    return listOfSearchResults.size();
+    return listOfSearchResults_.size();
 }
 
 int SearchResultsTableModel::columnCount(const QModelIndex &index) const
@@ -380,11 +382,11 @@ QVariant SearchResultsTableModel::data(const QModelIndex &index, int role) const
     if (!index.isValid())
         return QVariant();
 
-    if (index.row() >= listOfSearchResults.size() || index.row() < 0)
+    if (index.row() >= listOfSearchResults_.size() || index.row() < 0)
         return QVariant();
 
     if (role == Qt::DisplayRole) {
-        QPair<QString, QStringList> pair = listOfSearchResults.at(index.row());
+        QPair<QString, QStringList> pair = listOfSearchResults_.at(index.row());
 
         if (index.column() == 0)
             return pair.first;
@@ -416,15 +418,15 @@ QVariant SearchResultsTableModel::headerData(int section, Qt::Orientation orient
 
 void SearchResultsTableModel::addResult(const QPair<QString, QStringList>& r)
 {
-    beginInsertRows(QModelIndex(), listOfSearchResults.count(), listOfSearchResults.count());
-    listOfSearchResults.push_back(r);
+    beginInsertRows(QModelIndex(), listOfSearchResults_.count(), listOfSearchResults_.count());
+    listOfSearchResults_.push_back(r);
     endInsertRows();
 }
 
 void SearchResultsTableModel::clearResults()
 {
-    beginRemoveRows(QModelIndex(), 0, listOfSearchResults.count());
-    listOfSearchResults.clear();
+    beginRemoveRows(QModelIndex(), 0, listOfSearchResults_.count());
+    listOfSearchResults_.clear();
     endRemoveRows();
 }
 
@@ -435,10 +437,10 @@ QPair<QString, QStringList> SearchResultsTableModel::rowAt(const QModelIndex &in
     if (!index.isValid())
         return result;
 
-    if (index.row() >= listOfSearchResults.size() || index.row() < 0)
+    if (index.row() >= listOfSearchResults_.size() || index.row() < 0)
         return result;
 
-    result = listOfSearchResults.at(index.row());
+    result = listOfSearchResults_.at(index.row());
 
     return result;
 }
@@ -447,7 +449,7 @@ QList< QPair<QString, QStringList> > SearchResultsTableModel::list() const
 {
     QList< QPair<QString, QStringList> > result;
 
-    result = listOfSearchResults;
+    result = listOfSearchResults_;
 
     return result;
 }

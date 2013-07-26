@@ -7,11 +7,17 @@ TEMPLATE = app
 SOURCES += main.cpp \
     mainwindow.cpp \
     dbbeagleapplication.cpp \
-    dbconnectiondialog.cpp
+    dbconnectiondialog.cpp \
+    adaptors/mysqldialectadaptor.cpp \
+    adaptors/orasqldialectadaptor.cpp
 HEADERS += mainwindow.h \
     dbbeagleapplication.h \
-    dbconnectiondialog.h
+    dbconnectiondialog.h \
+    sqldialectadaptor.h \
+    adaptors/mysqldialectadaptor.h \
+    adaptors/orasqldialectadaptor.h
 FORMS += mainwindow.ui \
     dbconnectiondialog.ui
 RESOURCES += dbbeagle.qrc
 TRANSLATIONS = dbbeagle_ru.ts
+ICON = icons/icon.icns

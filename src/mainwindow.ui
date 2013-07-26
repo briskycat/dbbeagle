@@ -23,7 +23,7 @@
      <number>2</number>
     </property>
     <property name="topMargin">
-     <number>2</number>
+     <number>8</number>
     </property>
     <property name="rightMargin">
      <number>2</number>
@@ -129,7 +129,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -154,7 +154,7 @@
     <string>Main Toolbar</string>
    </property>
    <property name="toolButtonStyle">
-    <enum>Qt::ToolButtonIconOnly</enum>
+    <enum>Qt::ToolButtonFollowStyle</enum>
    </property>
    <attribute name="toolBarArea">
     <enum>LeftToolBarArea</enum>
@@ -175,8 +175,14 @@
    <property name="text">
     <string>Connect to a &amp;datasource...</string>
    </property>
+   <property name="iconText">
+    <string>Connect</string>
+   </property>
    <property name="toolTip">
     <string>Make new or switch existing connection to a datasource</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
   </action>
   <action name="exitAction">
@@ -190,18 +196,29 @@
    <property name="toolTip">
     <string>Exit the application</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::QuitRole</enum>
+   </property>
   </action>
   <action name="searchInFoundAction">
    <property name="icon">
-    <iconset>
-     <normalon>:/icons/arrow-up-double.png</normalon>
-    </iconset>
+    <iconset resource="dbbeagle.qrc">
+     <normaloff>:/icons/arrow-up-double.png</normaloff>:/icons/arrow-up-double.png</iconset>
    </property>
    <property name="text">
-    <string>Search in found</string>
+    <string>Search in the found tables</string>
+   </property>
+   <property name="iconText">
+    <string>In found</string>
    </property>
    <property name="toolTip">
     <string>Use found table names as search criteria</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+F</string>
    </property>
   </action>
  </widget>

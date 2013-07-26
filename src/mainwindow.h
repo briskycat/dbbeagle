@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "ui_mainwindow.h"
+#include "adaptors/orasqldialectadaptor.h"
 
 class QSortFilterProxyModel;
 class SearchResultsTableModel;
@@ -33,10 +34,12 @@ private slots:
     void executeQuery_();
 
 private:
-    QSortFilterProxyModel* sortProxyModel;
-    SearchResultsTableModel* searchResults;
+    QSortFilterProxyModel* sortProxyModel_;
+    SearchResultsTableModel* searchResults_;
 
-    QSqlQueryModel* sqlQueryModel;
+    QSqlQueryModel* sqlQueryModel_;
+
+    std::auto_ptr<SQLDialectAdaptor> sqlDialectAdaptor_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -60,7 +63,7 @@ public:
     QList< QPair<QString, QStringList> > list() const;
 
 private:
-    QList< QPair<QString, QStringList> > listOfSearchResults;
+    QList< QPair<QString, QStringList> > listOfSearchResults_;
 };
 
 

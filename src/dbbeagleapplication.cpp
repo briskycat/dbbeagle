@@ -28,5 +28,6 @@ void DBBeagleApplication::initialize()
 
 QString DBBeagleApplication::dbDriver()
 {
-    return QString("QODBC");
+    // return QString("QODBC");
+    return QString("QOCI");
 }
