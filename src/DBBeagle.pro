@@ -19,5 +19,11 @@ HEADERS += mainwindow.h \
 FORMS += mainwindow.ui \
     dbconnectiondialog.ui
 RESOURCES += dbbeagle.qrc
-TRANSLATIONS = dbbeagle_ru.ts
+
+# Resource file for application icon for Windows
+RC_FILE = dbbeagle_win.rc
+
+# Icon file for Mac OS X
 ICON = icons/icon.icns
+
+TRANSLATIONS = dbbeagle_ru.ts
