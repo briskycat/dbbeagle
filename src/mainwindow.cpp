@@ -250,21 +250,31 @@ void MainWindow::search_()
             continue;
         }
 
-        queryStr += QString(" where %1=?").arg(rec.fieldName(0));
-        for (int i = 1; i < rec.count(); i++)
+        int numberOfconditions = 0;
+        for (int i = 0; i < rec.count(); i++)
         {
-            queryStr += QString(" or %1=?").arg(rec.fieldName(i));
+            QSqlField field = rec.field(i);
+
+            // Skip CLOBs, BLOBs and unknown types
+            if(field.type() == QVariant::Invalid || field.type() == QVariant::ByteArray)
+                continue;
+
+            if (numberOfconditions++ == 0) {
+                queryStr += QString(" where %1=?").arg(field.name());
+            } else {
+                queryStr += QString(" or %1=?").arg(field.name());
+            }
         }
         queryStr = sqlDialectAdaptor_->addSQLLimitClause(queryStr, 1);
 
-        if(!sqlQuery.prepare(queryStr))
+        if (!sqlQuery.prepare(queryStr))
         {
             qDebug() << tr("Failed to prepare the query \"%1\".").arg(queryStr);
             qDebug() << sqlQuery.lastError();
             continue;
         }
 
-        for (int i = 0; i < rec.count(); i++)
+        for (int i = 0; i < numberOfconditions; i++)
         {
             sqlQuery.bindValue(i, QVariant(valueLineEdit->text()));
         }
@@ -323,7 +333,7 @@ void MainWindow::copyTableNamesFromResults_()
 {
     QStringList l;
     QList< QPair<QString, QStringList> > rl = searchResults_->list();
-    QPair<QString, QStringList>  p;
+    QPair<QString, QStringList> p;
     foreach (p, rl)
         l.append(p.first);
 
