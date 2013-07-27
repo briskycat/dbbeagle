@@ -10,7 +10,8 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Database driver &apos;%1&apos; is not available</source>
+        <source>The database driver &quot;%1&quot; is not available</source>
+        <oldsource>Database driver &apos;%1&apos; is not available</oldsource>
         <translation>Драйвер баз данных &quot;%1&quot; недоступен</translation>
     </message>
 </context>
@@ -51,7 +52,7 @@
     </message>
     <message>
         <location line="+27"/>
-        <location filename="mainwindow.cpp" line="+151"/>
+        <location filename="mainwindow.cpp" line="+153"/>
         <location line="+25"/>
         <location line="+18"/>
         <location line="+9"/>
@@ -121,9 +122,19 @@
     </message>
     <message>
         <location line="+3"/>
+        <source>Connect</source>
+        <translation>Подключиться</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>Make new or switch existing connection to a datasource</source>
         <oldsource>Perform new or switch existing connection to a datasource</oldsource>
         <translation>Сделать новое или переключить существующее соединение с источником данных</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Ctrl+O</source>
+        <translation>Ctrl+O</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -136,12 +147,31 @@
         <translation>Выйти из приложения</translation>
     </message>
     <message>
-        <location line="+10"/>
-        <source>Search in found</source>
-        <translation>Искать в найденном</translation>
+        <location line="+3"/>
+        <source>Ctrl+Q</source>
+        <translation>Ctrl+Q</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Search in the found tables</source>
+        <translation>Искать в найденных таблицах</translation>
     </message>
     <message>
         <location line="+3"/>
+        <source>In found</source>
+        <translation>В найденном</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Ctrl+Shift+F</source>
+        <translation>Ctrl+Shift+F</translation>
+    </message>
+    <message>
+        <source>Search in found</source>
+        <translation type="obsolete">Искать в найденном</translation>
+    </message>
+    <message>
+        <location line="-3"/>
         <source>Use found table names as search criteria</source>
         <translation>Использовать в качестве критериев поиска найденные имена таблиц</translation>
     </message>
@@ -151,14 +181,13 @@
         <translation>Ошибка соединения</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Could not connect to datasource.
 Reason: &quot;%1&quot;.</source>
-        <translation>Невозможно подключиться к источнику данных.
+        <translation type="obsolete">Невозможно подключиться к источнику данных.
 Причина: &quot;%1&quot;.</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+8"/>
         <source>Connected to %1</source>
         <translation>Установлено соединение с %1</translation>
     </message>
@@ -178,8 +207,19 @@ Reason: &quot;%1&quot;.</source>
         <translation>База данных не содержит ни одной таблицы.</translation>
     </message>
     <message>
-        <location line="+25"/>
         <source>The database does not contain a table named &apos;%1&apos;.</source>
+        <translation type="obsolete">База данных не содержит таблицы с названием &quot;%1&quot;.</translation>
+    </message>
+    <message>
+        <location line="-61"/>
+        <source>Could not connect to the datasource.
+The reason was: &quot;%1&quot;.</source>
+        <translation>Невозможно подключиться к источнику.
+Причина: &quot;%1&quot;.</translation>
+    </message>
+    <message>
+        <location line="+86"/>
+        <source>The database does not contain a table named &quot;%1&quot;.</source>
         <translation>База данных не содержит таблицы с названием &quot;%1&quot;.</translation>
     </message>
     <message>
@@ -209,26 +249,45 @@ Reason: &quot;%1&quot;.</source>
     </message>
     <message>
         <location line="+1"/>
-        <source>query was &apos;%1&apos;</source>
+        <source>the query was &quot;%1&quot;</source>
         <translation>запрос был &quot;%1&quot;</translation>
     </message>
     <message>
-        <location line="+19"/>
-        <source>No fields in %1 match the type of the value.</source>
-        <translation>Ни одно поле в %1 не удовлетворяет типу величины.</translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <source>Failed to prepare query &apos;%1&apos;.</source>
+        <location line="+32"/>
+        <source>Failed to prepare the query &quot;%1&quot;.</source>
         <translation>Не удалось подготовить запрос &quot;%1&quot;.</translation>
     </message>
     <message>
         <location line="+11"/>
-        <source>Failed to execute query &apos;%1&apos;.</source>
+        <source>Failed to execute the query &quot;%1&quot;.</source>
         <translation>Не удалось выполнить запрос &quot;%1&quot;.</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+43"/>
+        <source>Error while executing the query:
+&quot;%1&quot;.</source>
+        <translation>Ошибка во время выполнения запроса:
+&quot;%1&quot;.</translation>
+    </message>
+    <message>
+        <source>query was &apos;%1&apos;</source>
+        <translation type="obsolete">запрос был &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <location line="-67"/>
+        <source>No fields in %1 match the type of the value.</source>
+        <translation>Ни одно поле в %1 не удовлетворяет типу величины.</translation>
+    </message>
+    <message>
+        <source>Failed to prepare query &apos;%1&apos;.</source>
+        <translation type="obsolete">Не удалось подготовить запрос &quot;%1&quot;.</translation>
+    </message>
+    <message>
+        <source>Failed to execute query &apos;%1&apos;.</source>
+        <translation type="obsolete">Не удалось выполнить запрос &quot;%1&quot;.</translation>
+    </message>
+    <message>
+        <location line="+29"/>
         <source>Found %1 in %2</source>
         <translation>Найдено %1 в %2</translation>
     </message>
@@ -238,17 +297,16 @@ Reason: &quot;%1&quot;.</source>
         <translation>SQL запрос</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Error while executing query:
 &apos;%1&apos;.</source>
-        <translation>Ошибка во время выполнения запроса:
+        <translation type="obsolete">Ошибка во время выполнения запроса:
 &quot;%1&quot;.</translation>
     </message>
 </context>
 <context>
     <name>SearchResultsTableModel</name>
     <message>
-        <location line="+91"/>
+        <location line="+92"/>
         <source>Table</source>
         <translation>Таблица</translation>
     </message>

@@ -176,7 +176,7 @@ void MainWindow::search_()
                 {
                     QMessageBox::warning(this,
                                          tr("Search"),
-                                         tr("The database does not contain a table named '%1'.").arg(str)
+                                         tr("The database does not contain a table named \"%1\".").arg(str)
                                          );
                     return;
                 }
@@ -227,7 +227,7 @@ void MainWindow::search_()
         if (rec.isEmpty())
         {
             qDebug() << tr("Encountered a record with no fields.");
-            qDebug() << tr("the query was '%1'").arg(sqlQuery.lastQuery());
+            qDebug() << tr("the query was \"%1\"").arg(sqlQuery.lastQuery());
             continue;
         }
 
@@ -259,7 +259,7 @@ void MainWindow::search_()
 
         if(!sqlQuery.prepare(queryStr))
         {
-            qDebug() << tr("Failed to prepare the query '%1'.").arg(queryStr);
+            qDebug() << tr("Failed to prepare the query \"%1\".").arg(queryStr);
             qDebug() << sqlQuery.lastError();
             continue;
         }
@@ -270,7 +270,7 @@ void MainWindow::search_()
         }
 
         if (!sqlQuery.exec())
-            qDebug() << tr("Failed to execute the query '%1'.").arg(sqlQuery.lastQuery());
+            qDebug() << tr("Failed to execute the query \"%1\".").arg(sqlQuery.lastQuery());
             qDebug() << sqlQuery.lastError();
 
         if (sqlQuery.next())
@@ -313,7 +313,7 @@ void MainWindow::executeQuery_()
     {
         QMessageBox::warning(this,
                              tr("SQL Query"),
-                             tr("Error while executing the query:\n'%1'.").arg(sqlQueryModel_->lastError().text())
+                             tr("Error while executing the query:\n\"%1\".").arg(sqlQueryModel_->lastError().text())
                              );
         Ui_MainWindow::statusBar->showMessage(sqlQueryModel_->lastError().text());
     }

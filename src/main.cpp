@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     {
         QMessageBox::critical(0,
                              DBBeagleApplication::tr("Initialization Error"),
-                             DBBeagleApplication::tr("The database driver '%1' is not available").arg(DBBeagleApplication::dbDriver())
+                             DBBeagleApplication::tr("The database driver \"%1\" is not available").arg(DBBeagleApplication::dbDriver())
                              );
         return EXIT_FAILURE;
     }
