@@ -18,6 +18,9 @@ public:
 
     void show();
 
+public slots:
+    void showAboutApp();
+
 protected:
     void changeEvent(QEvent *e);
 

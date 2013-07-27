@@ -4,5 +4,6 @@
         <file>icons/svn-update.png</file>
         <file>icons/cs_beagle.png</file>
         <file>icons/application-exit.png</file>
+        <file>icons/beagle.svg</file>
     </qresource>
 </RCC>

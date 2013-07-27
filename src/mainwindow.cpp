@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "dbbeagleapplication.h"
 #include "dbconnectiondialog.h"
+#include "appaboutdialog.h"
 
 #include <QSqlDatabase>
 #include <QSqlError>
@@ -44,8 +45,8 @@ MainWindow::MainWindow(QWidget *parent) :
     queryTableView->installEventFilter(this);
 
     connect(exitAction, SIGNAL(triggered()), SLOT(close()));
-
     connect(connectToDatasourceAction, SIGNAL(triggered()), SLOT(connectToDB_()));
+    connect(aboutAction, SIGNAL(triggered()), SLOT(showAboutApp()));
 
     connect(searchPushButton, SIGNAL(clicked()), SLOT(search_()));
     connect(searchResultsTableView, SIGNAL(doubleClicked(const QModelIndex& )), SLOT(resultsItemActivated_(const QModelIndex&)));
@@ -128,6 +129,12 @@ void MainWindow::show()
 {
     updateConnectionStatus_();
     QMainWindow::show();
+}
+
+void MainWindow::showAboutApp()
+{
+    AppAboutDialog appAboutDialog(this);
+    appAboutDialog.exec();
 }
 
 void MainWindow::search_()
