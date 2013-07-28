@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="dbbeagle.qrc">
-    <normaloff>:/icons/cs_beagle.png</normaloff>:/icons/cs_beagle.png</iconset>
+    <normaloff>:/icons/beagle.svg</normaloff>:/icons/beagle.svg</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
