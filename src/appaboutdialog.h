@@ -12,7 +12,7 @@ class AppAboutDialog : public QDialog
     Q_OBJECT
     
 public:
-    explicit AppAboutDialog(QWidget *parent = 0);
+    explicit AppAboutDialog(QWidget *parent = nullptr);
     ~AppAboutDialog();
     
 private:

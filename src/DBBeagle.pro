@@ -2,6 +2,7 @@
 # Project created by QtCreator 2010-04-16T16:05:25
 # -------------------------------------------------
 QT +=  core gui widgets sql
+CONFIG += c++11
 TARGET = DBBeagle
 TEMPLATE = app
 SOURCES += main.cpp \

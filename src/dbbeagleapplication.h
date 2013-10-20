@@ -2,27 +2,44 @@
 #define DBEAGLEAPPLICATION_H
 
 #include <QApplication>
-#include <memory>
+#include <QTranslator>
+#include <QScopedPointer>
 
 class QSqlDatabase;
+class MainWindow;
 
 class DBBeagleApplication : public QApplication
 {
     Q_OBJECT
 public:
-    DBBeagleApplication(int& argc, char** argv);
+    DBBeagleApplication(int& argc, char *argv[]);
     ~DBBeagleApplication();
 
     static DBBeagleApplication* instance();
-    static void initialize();
     static QString dbDriver();
+
+    int exec();
 
 signals:
 
 public:
-    std::auto_ptr<QSqlDatabase> pDb;
+    QScopedPointer<QSqlDatabase> pDb;
 
 public slots:
+
+private:
+    DBBeagleApplication(DBBeagleApplication const&) = delete;
+    void operator=(DBBeagleApplication const&) = delete;
+
+    void initialize_();
+
+private:
+    static DBBeagleApplication* app_;
+
+    QScopedPointer<MainWindow> mainWindow_;
+
+    QTranslator qtTranslator_;
+    QTranslator appTranslator_;
 
 };
 

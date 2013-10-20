@@ -14,7 +14,7 @@ class QSqlQueryModel;
 class MainWindow : public QMainWindow, private Ui::MainWindow {
     Q_OBJECT
 public:
-    MainWindow(QWidget *parent = 0);
+    MainWindow(QWidget *parent = nullptr);
 
     void show();
 
@@ -22,9 +22,9 @@ public slots:
     void showAboutApp();
 
 protected:
-    void changeEvent(QEvent *e);
+    void changeEvent(QEvent *e) override;
 
-    bool eventFilter(QObject *obj, QEvent *event);
+    bool eventFilter(QObject *obj, QEvent *event) override;
 
 private slots:
     void connectToDB_();
@@ -53,12 +53,12 @@ class SearchResultsTableModel : public QAbstractTableModel
     Q_OBJECT
 
 public:
-    SearchResultsTableModel(QObject *parent=0);
+    SearchResultsTableModel(QObject *parent = nullptr);
 
-    int rowCount(const QModelIndex &index) const;
-    int columnCount(const QModelIndex &index) const;
-    QVariant data(const QModelIndex &index, int role) const;
-    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+    int rowCount(const QModelIndex &index) const override;
+    int columnCount(const QModelIndex &index) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
     void addResult(const QPair<QString, QStringList>& r);
     void clearResults();

@@ -6,7 +6,7 @@
 class DBConnectionDialog : public QDialog, private Ui::DBConnectionDialog {
     Q_OBJECT
 public:
-    DBConnectionDialog(QWidget *parent = 0);
+    DBConnectionDialog(QWidget *parent = nullptr);
 
     QString getHost() { return hostLineEdit->text(); }
     QString getDatabase() { return databaseLineEdit->text(); }

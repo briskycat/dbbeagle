@@ -149,7 +149,7 @@ void MainWindow::search_()
     }
 
     QSet<QString> availableTables;
-    foreach (QString str, DBBeagleApplication::instance()->pDb->tables())
+    for (QString str : DBBeagleApplication::instance()->pDb->tables())
         availableTables.insert(str.toLower());
 
 
@@ -177,7 +177,7 @@ void MainWindow::search_()
                     QSet<QString>::fromList(
                             tablesLineEdit->text().toLower().split(QRegExp("\\s*\\,\\s*"), QString::SkipEmptyParts)
                             );
-            foreach (QString str, tablesToSearch)
+            for (QString str : tablesToSearch)
             {
                 if (!availableTables.contains(str))
                 {
@@ -220,7 +220,7 @@ void MainWindow::search_()
     QProgressDialog progress(tr("Searching..."), tr("Abort Search"), 0, tablesToSearch.count(), this);
     progress.setWindowModality(Qt::WindowModal);
     int searchCount = 0;
-    foreach (QString curTable, tablesToSearch)
+    for (QString curTable : tablesToSearch)
     {
         progress.setValue(searchCount);
         if (progress.wasCanceled())
@@ -228,7 +228,7 @@ void MainWindow::search_()
         searchCount++;
 
         QString queryStr = QString("select * from %1").arg(curTable);
-        QSqlQuery sqlQuery(sqlDialectAdaptor_->addSQLLimitClause(queryStr, 0), *(DBBeagleApplication::instance()->pDb.get()));
+        QSqlQuery sqlQuery(sqlDialectAdaptor_->addSQLLimitClause(queryStr, 0), *(DBBeagleApplication::instance()->pDb.data()));
         sqlQuery.setForwardOnly(true);
         QSqlRecord rec = sqlQuery.record();
         if (rec.isEmpty())
@@ -325,7 +325,7 @@ void MainWindow::resultsItemActivated_( const QModelIndex& index )
 
 void MainWindow::executeQuery_()
 {
-    sqlQueryModel_->setQuery(queryLineEdit->text(), *(DBBeagleApplication::instance()->pDb.get()));
+    sqlQueryModel_->setQuery(queryLineEdit->text(), *(DBBeagleApplication::instance()->pDb.data()));
     if (sqlQueryModel_->lastError().isValid())
     {
         QMessageBox::warning(this,
@@ -340,8 +340,7 @@ void MainWindow::copyTableNamesFromResults_()
 {
     QStringList l;
     QList< QPair<QString, QStringList> > rl = searchResults_->list();
-    QPair<QString, QStringList> p;
-    foreach (p, rl)
+    for (QPair<QString, QStringList> p : rl)
         l.append(p.first);
 
     if (!l.isEmpty())

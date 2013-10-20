@@ -1,24 +1,12 @@
 #include "dbbeagleapplication.h"
-#include "mainwindow.h"
 
 #include <cstdlib>
 #include <QSqlDatabase>
-#include <QTranslator>
-#include <QLibraryInfo>
 #include <QMessageBox>
 
 int main(int argc, char *argv[])
 {
     DBBeagleApplication app(argc, argv);
-
-    QTranslator qtTranslator;
-    qtTranslator.load("qt_" + QLocale::system().name(),
-                      QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-    app.installTranslator(&qtTranslator);
-
-    QTranslator appTranslator;
-    appTranslator.load("dbbeagle_" + QLocale::system().name());
-    app.installTranslator(&appTranslator);
 
     if(!QSqlDatabase::drivers().contains(DBBeagleApplication::dbDriver()))
     {
@@ -28,11 +16,6 @@ int main(int argc, char *argv[])
                              );
         return EXIT_FAILURE;
     }
-
-    DBBeagleApplication::initialize();
-
-    MainWindow w;
-    w.show();
 
     return app.exec();
 }
