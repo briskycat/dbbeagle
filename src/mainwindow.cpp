@@ -70,30 +70,32 @@ void MainWindow::changeEvent(QEvent *e)
 
 void MainWindow::connectToDB_()
 {
-    if (DBBeagleApplication::instance()->pDb->isOpen())
+    if (DBBeagleApplication::instance()->dbConnection.isOpen())
     {
-        DBBeagleApplication::instance()->pDb->close();
+        DBBeagleApplication::instance()->dbConnection.close();
         updateConnectionStatus_();
     }
 
-    DBConnectionDialog dbDlg(this);
+    DBConnectionDialog dbDlg(QSqlDatabase::drivers(), this);
     dbDlg.readSettings();
 
     if(dbDlg.exec() == QDialog::Accepted)
     {
-        DBBeagleApplication::instance()->pDb->setHostName(dbDlg.getHost());
-        DBBeagleApplication::instance()->pDb->setDatabaseName(dbDlg.getDatabase());
-        DBBeagleApplication::instance()->pDb->setUserName(dbDlg.getUser());
-        DBBeagleApplication::instance()->pDb->setPassword(dbDlg.getPassword());
+        QSqlDatabase::removeDatabase(DBBeagleApplication::instance()->dbConnection.connectionName());
+        DBBeagleApplication::instance()->dbConnection = QSqlDatabase::addDatabase(dbDlg.getDriver());
+        DBBeagleApplication::instance()->dbConnection.setHostName(dbDlg.getHost());
+        DBBeagleApplication::instance()->dbConnection.setDatabaseName(dbDlg.getDatabase());
+        DBBeagleApplication::instance()->dbConnection.setUserName(dbDlg.getUser());
+        DBBeagleApplication::instance()->dbConnection.setPassword(dbDlg.getPassword());
 
-        bool ok = DBBeagleApplication::instance()->pDb->open();
+        bool ok = DBBeagleApplication::instance()->dbConnection.open();
         if(!ok)
         {
             QMessageBox::warning(this,
                                  tr("Connection Error"),
-                                 tr("Could not connect to the datasource.\nThe reason was: \"%1\".").arg(DBBeagleApplication::instance()->pDb->lastError().text())
+                                 tr("Could not connect to the datasource.\nThe reason was: \"%1\".").arg(DBBeagleApplication::instance()->dbConnection.lastError().text())
                                  );
-            Ui_MainWindow::statusBar->showMessage(DBBeagleApplication::instance()->pDb->lastError().text());
+            Ui_MainWindow::statusBar->showMessage(DBBeagleApplication::instance()->dbConnection.lastError().text());
         }
         else
         {
@@ -107,7 +109,7 @@ void MainWindow::connectToDB_()
 
 void MainWindow::updateConnectionStatus_()
 {
-    bool dbOpen = DBBeagleApplication::instance()->pDb->isOpen();
+    bool dbOpen = DBBeagleApplication::instance()->dbConnection.isOpen();
     for (int i = 0; i < searchControlsLayout->count(); ++i)
     {
         QWidget* w = searchControlsLayout->itemAt(i)->widget();
@@ -149,7 +151,7 @@ void MainWindow::search_()
     }
 
     QSet<QString> availableTables;
-    for (QString str : DBBeagleApplication::instance()->pDb->tables())
+    for (QString str : DBBeagleApplication::instance()->dbConnection.tables())
         availableTables.insert(str.toLower());
 
 
@@ -228,7 +230,7 @@ void MainWindow::search_()
         searchCount++;
 
         QString queryStr = QString("select * from %1").arg(curTable);
-        QSqlQuery sqlQuery(sqlDialectAdaptor_->addSQLLimitClause(queryStr, 0), *(DBBeagleApplication::instance()->pDb.data()));
+        QSqlQuery sqlQuery(sqlDialectAdaptor_->addSQLLimitClause(queryStr, 0), DBBeagleApplication::instance()->dbConnection);
         sqlQuery.setForwardOnly(true);
         QSqlRecord rec = sqlQuery.record();
         if (rec.isEmpty())
@@ -325,7 +327,7 @@ void MainWindow::resultsItemActivated_( const QModelIndex& index )
 
 void MainWindow::executeQuery_()
 {
-    sqlQueryModel_->setQuery(queryLineEdit->text(), *(DBBeagleApplication::instance()->pDb.data()));
+    sqlQueryModel_->setQuery(queryLineEdit->text(), DBBeagleApplication::instance()->dbConnection);
     if (sqlQueryModel_->lastError().isValid())
     {
         QMessageBox::warning(this,

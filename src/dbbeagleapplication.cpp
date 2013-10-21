@@ -1,7 +1,6 @@
 #include "dbbeagleapplication.h"
 #include "mainwindow.h"
 
-#include <QSqlDatabase>
 #include <QLibraryInfo>
 
 DBBeagleApplication* DBBeagleApplication::app_ = nullptr;
@@ -17,8 +16,8 @@ DBBeagleApplication::~DBBeagleApplication()
 {
     app_ = nullptr;
 
-    if(pDb.data())
-        pDb->close();
+    if(dbConnection.isOpen())
+        dbConnection.close();
 }
 
 DBBeagleApplication* DBBeagleApplication::instance()
@@ -38,15 +37,7 @@ void DBBeagleApplication::initialize_()
     appTranslator_.load("dbbeagle_" + QLocale::system().name());
     installTranslator(&appTranslator_);
 
-    pDb.reset(new QSqlDatabase(QSqlDatabase::addDatabase(dbDriver())));
-
     mainWindow_.reset(new MainWindow());
-}
-
-QString DBBeagleApplication::dbDriver()
-{
-    // return QString("QODBC");
-    return QString("QOCI");
 }
 
 int DBBeagleApplication::exec()

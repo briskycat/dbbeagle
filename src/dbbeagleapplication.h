@@ -2,10 +2,9 @@
 #define DBEAGLEAPPLICATION_H
 
 #include <QApplication>
+#include <QSqlDatabase>
 #include <QTranslator>
-#include <QScopedPointer>
 
-class QSqlDatabase;
 class MainWindow;
 
 class DBBeagleApplication : public QApplication
@@ -16,14 +15,13 @@ public:
     ~DBBeagleApplication();
 
     static DBBeagleApplication* instance();
-    static QString dbDriver();
 
     int exec();
 
 signals:
 
 public:
-    QScopedPointer<QSqlDatabase> pDb;
+    QSqlDatabase dbConnection;
 
 public slots:
 

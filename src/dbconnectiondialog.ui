@@ -87,6 +87,14 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>dbDriverComboBox</tabstop>
+  <tabstop>hostLineEdit</tabstop>
+  <tabstop>databaseLineEdit</tabstop>
+  <tabstop>userLineEdit</tabstop>
+  <tabstop>passwordLineEdit</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
