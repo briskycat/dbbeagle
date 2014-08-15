@@ -14,14 +14,14 @@ public:
     DBBeagleApplication(int& argc, char *argv[]);
     ~DBBeagleApplication();
 
-    static DBBeagleApplication* instance();
+    static DBBeagleApplication& instance();
 
     int exec();
 
 signals:
 
 public:
-    QSqlDatabase dbConnection;
+    QSqlDatabase qsqlDb;
 
 public slots:
 

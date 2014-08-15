@@ -24,8 +24,6 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     setupUi(this);
 
-    sqlDialectAdaptor_.reset(new OraSQLDialectAdaptor());
-
     searchResults_ = new SearchResultsTableModel(this);
 
     sortProxyModel_ = new QSortFilterProxyModel(this);
@@ -43,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :
     sqlQueryModel_ = new QSqlQueryModel(this);
     queryTableView->setModel(sqlQueryModel_);
     queryTableView->installEventFilter(this);
+    queryTableView->setItemDelegate(new QueryViewItemDelegate(queryTableView));
 
     connect(exitAction, SIGNAL(triggered()), SLOT(close()));
     connect(connectToDatasourceAction, SIGNAL(triggered()), SLOT(connectToDB_()));
@@ -70,32 +69,45 @@ void MainWindow::changeEvent(QEvent *e)
 
 void MainWindow::connectToDB_()
 {
-    if (DBBeagleApplication::instance()->dbConnection.isOpen())
-    {
-        DBBeagleApplication::instance()->dbConnection.close();
-        updateConnectionStatus_();
+    QStringList availableDrivers = QSqlDatabase::drivers(), supportedDrivers;
+
+    for(QString driver : availableDrivers) {
+        if (dialectAdaptors_.find(driver.toStdString()) == dialectAdaptors_.end())
+            continue;
+        supportedDrivers.push_back(driver);
     }
 
-    DBConnectionDialog dbDlg(QSqlDatabase::drivers(), this);
+    DBConnectionDialog dbDlg(supportedDrivers, this);
     dbDlg.readSettings();
 
     if(dbDlg.exec() == QDialog::Accepted)
     {
-        QSqlDatabase::removeDatabase(DBBeagleApplication::instance()->dbConnection.connectionName());
-        DBBeagleApplication::instance()->dbConnection = QSqlDatabase::addDatabase(dbDlg.getDriver());
-        DBBeagleApplication::instance()->dbConnection.setHostName(dbDlg.getHost());
-        DBBeagleApplication::instance()->dbConnection.setDatabaseName(dbDlg.getDatabase());
-        DBBeagleApplication::instance()->dbConnection.setUserName(dbDlg.getUser());
-        DBBeagleApplication::instance()->dbConnection.setPassword(dbDlg.getPassword());
+        if (DBBeagleApplication::instance().qsqlDb.isOpen())
+        {
+            DBBeagleApplication::instance().qsqlDb.close();
+            updateConnectionStatus_();
+        }
 
-        bool ok = DBBeagleApplication::instance()->dbConnection.open();
+        QSqlDatabase::removeDatabase(DBBeagleApplication::instance().qsqlDb.connectionName());
+
+        sqlDialectAdaptor_.reset(dialectAdaptors_.find(dbDlg.getDriver().toStdString())->second());
+
+        DBBeagleApplication::instance().qsqlDb = QSqlDatabase::addDatabase(dbDlg.getDriver());
+        DBBeagleApplication::instance().qsqlDb.setHostName(dbDlg.getHost());
+        DBBeagleApplication::instance().qsqlDb.setDatabaseName(dbDlg.getDatabase());
+        DBBeagleApplication::instance().qsqlDb.setUserName(dbDlg.getUser());
+        DBBeagleApplication::instance().qsqlDb.setPassword(dbDlg.getPassword());
+
+        DBBeagleApplication::instance().qsqlDb.setNumericalPrecisionPolicy(QSql::HighPrecision);
+
+        bool ok = DBBeagleApplication::instance().qsqlDb.open();
         if(!ok)
         {
             QMessageBox::warning(this,
                                  tr("Connection Error"),
-                                 tr("Could not connect to the datasource.\nThe reason was: \"%1\".").arg(DBBeagleApplication::instance()->dbConnection.lastError().text())
+                                 tr("Could not connect to the datasource.\nThe reason was: \"%1\".").arg(DBBeagleApplication::instance().qsqlDb.lastError().text())
                                  );
-            Ui_MainWindow::statusBar->showMessage(DBBeagleApplication::instance()->dbConnection.lastError().text());
+            Ui_MainWindow::statusBar->showMessage(DBBeagleApplication::instance().qsqlDb.lastError().text());
         }
         else
         {
@@ -103,13 +115,14 @@ void MainWindow::connectToDB_()
             Ui_MainWindow::statusBar->showMessage(tr("Connected to %1").arg(dbDlg.getDatabase()));
         }
 
-        updateConnectionStatus_();
     }
+
+    updateConnectionStatus_();
 }
 
 void MainWindow::updateConnectionStatus_()
 {
-    bool dbOpen = DBBeagleApplication::instance()->dbConnection.isOpen();
+    bool dbOpen = DBBeagleApplication::instance().qsqlDb.isOpen();
     for (int i = 0; i < searchControlsLayout->count(); ++i)
     {
         QWidget* w = searchControlsLayout->itemAt(i)->widget();
@@ -150,9 +163,12 @@ void MainWindow::search_()
         return;
     }
 
+    qDebug() << tr("Available tables:");
     QSet<QString> availableTables;
-    for (QString str : DBBeagleApplication::instance()->dbConnection.tables())
+    for (QString str : DBBeagleApplication::instance().qsqlDb.tables()) {
         availableTables.insert(str.toLower());
+        qDebug() << str;
+    }
 
 
 
@@ -169,12 +185,9 @@ void MainWindow::search_()
     QSet<QString> tablesToSearch;
 
     if (!excludeTablesCheckBox->isChecked()) {
-        if (tablesLineEdit->text() == "*")
-        {
+        if (tablesLineEdit->text() == "*") {
             tablesToSearch = availableTables;
-        }
-        else
-        {
+        } else {
             tablesToSearch =
                     QSet<QString>::fromList(
                             tablesLineEdit->text().toLower().split(QRegExp("\\s*\\,\\s*"), QString::SkipEmptyParts)
@@ -230,7 +243,7 @@ void MainWindow::search_()
         searchCount++;
 
         QString queryStr = QString("select * from %1").arg(curTable);
-        QSqlQuery sqlQuery(sqlDialectAdaptor_->addSQLLimitClause(queryStr, 0), DBBeagleApplication::instance()->dbConnection);
+        QSqlQuery sqlQuery(sqlDialectAdaptor_->addSQLLimitClause(queryStr, 0), DBBeagleApplication::instance().qsqlDb);
         sqlQuery.setForwardOnly(true);
         QSqlRecord rec = sqlQuery.record();
         if (rec.isEmpty())
@@ -303,7 +316,7 @@ void MainWindow::search_()
                 if(sqlQuery.value(i) == QVariant(valueLineEdit->text()))
                     columns.push_back(rec.fieldName(i));
             }
-            searchResults_->addResult(QPair<QString, QStringList>(curTable, columns));
+            searchResults_->addResult(SearchResultsTableModel::SearchResultType(curTable, columns));
         }
 
     }
@@ -313,13 +326,18 @@ void MainWindow::search_()
 
 void MainWindow::resultsItemActivated_( const QModelIndex& index )
 {
-    QPair<QString, QStringList> p = searchResults_->rowAt(
+    SearchResultsTableModel::SearchResultType p = searchResults_->rowAt(
             dynamic_cast<QAbstractProxyModel*>(searchResultsTableView->model())->mapToSource(index)
             );
+
+    if(p.second.count() == 0)
+        return;
+
     QString query = QString("select * from %1").arg(p.first);
     query += QString(" where %1='%2'").arg(p.second.at(0), valueLineEdit->text());
     for (int i = 1; i < p.second.count(); i++)
         query += QString(" or %1='%2'").arg(p.second.at(i), valueLineEdit->text());
+
     queryLineEdit->setText(query);
     executeQuery_();
     tabWidget->setCurrentIndex(1);
@@ -327,7 +345,7 @@ void MainWindow::resultsItemActivated_( const QModelIndex& index )
 
 void MainWindow::executeQuery_()
 {
-    sqlQueryModel_->setQuery(queryLineEdit->text(), DBBeagleApplication::instance()->dbConnection);
+    sqlQueryModel_->setQuery(queryLineEdit->text(), DBBeagleApplication::instance().qsqlDb);
     if (sqlQueryModel_->lastError().isValid())
     {
         QMessageBox::warning(this,
@@ -341,8 +359,8 @@ void MainWindow::executeQuery_()
 void MainWindow::copyTableNamesFromResults_()
 {
     QStringList l;
-    QList< QPair<QString, QStringList> > rl = searchResults_->list();
-    for (QPair<QString, QStringList> p : rl)
+    SearchResultsTableModel::ListOfSearchResultsType rl = searchResults_->list();
+    for (SearchResultsTableModel::SearchResultType p : rl)
         l.append(p.first);
 
     if (!l.isEmpty())
@@ -404,7 +422,7 @@ QVariant SearchResultsTableModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     if (role == Qt::DisplayRole) {
-        QPair<QString, QStringList> pair = listOfSearchResults_.at(index.row());
+        SearchResultType pair = listOfSearchResults_.at(index.row());
 
         if (index.column() == 0)
             return pair.first;
@@ -434,7 +452,7 @@ QVariant SearchResultsTableModel::headerData(int section, Qt::Orientation orient
     return QVariant();
 }
 
-void SearchResultsTableModel::addResult(const QPair<QString, QStringList>& r)
+void SearchResultsTableModel::addResult(const SearchResultsTableModel::SearchResultType& r)
 {
     beginInsertRows(QModelIndex(), listOfSearchResults_.count(), listOfSearchResults_.count());
     listOfSearchResults_.push_back(r);
@@ -448,9 +466,9 @@ void SearchResultsTableModel::clearResults()
     endRemoveRows();
 }
 
-QPair<QString, QStringList> SearchResultsTableModel::rowAt(const QModelIndex &index) const
+SearchResultsTableModel::SearchResultType SearchResultsTableModel::rowAt(const QModelIndex &index) const
 {
-    QPair<QString, QStringList> result;
+    SearchResultsTableModel::SearchResultType result;
 
     if (!index.isValid())
         return result;
@@ -463,11 +481,26 @@ QPair<QString, QStringList> SearchResultsTableModel::rowAt(const QModelIndex &in
     return result;
 }
 
-QList< QPair<QString, QStringList> > SearchResultsTableModel::list() const
+SearchResultsTableModel::ListOfSearchResultsType SearchResultsTableModel::list() const
 {
-    QList< QPair<QString, QStringList> > result;
+    SearchResultsTableModel::ListOfSearchResultsType result;
 
     result = listOfSearchResults_;
 
     return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+QString	QueryViewItemDelegate::displayText(const QVariant& value, const QLocale& locale) const
+{
+    switch (value.type())
+    {
+    case QMetaType::Double:
+        return locale.toString(value.toDouble(), 'g', 96);
+        break;
+    default:
+        break;
+    }
+
+    return QStyledItemDelegate::displayText(value, locale);
 }

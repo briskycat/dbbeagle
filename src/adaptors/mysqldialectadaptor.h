@@ -9,6 +9,8 @@ public:
     MySQLDialectAdaptor();
 
     virtual QString addSQLLimitClause(const QString& src, unsigned long limit);
+
+    static MySQLDialectAdaptor* create() { return new MySQLDialectAdaptor(); }
 };
 
 #endif // MYSQLDIALECTADAPTOR_H

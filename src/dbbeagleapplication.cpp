@@ -16,13 +16,13 @@ DBBeagleApplication::~DBBeagleApplication()
 {
     app_ = nullptr;
 
-    if(dbConnection.isOpen())
-        dbConnection.close();
+    if(qsqlDb.isOpen())
+        qsqlDb.close();
 }
 
-DBBeagleApplication* DBBeagleApplication::instance()
+DBBeagleApplication& DBBeagleApplication::instance()
 {
-    return app_;
+    return *app_;
 }
 
 void DBBeagleApplication::initialize_()
