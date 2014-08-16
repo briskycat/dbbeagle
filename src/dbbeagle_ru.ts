@@ -1,18 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ru" sourcelanguage="en">
+<TS version="2.1" language="ru" sourcelanguage="en">
+<context>
+    <name>AppAboutDialog</name>
+    <message>
+        <location filename="appaboutdialog.ui" line="+64"/>
+        <source>%1</source>
+        <translation>%1</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Version %1 from %2</source>
+        <translation>Версия %1 от %2</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Copyright © 2010, 2013, 2014 Andrew Novikov</source>
+        <translation>Авторское право © 2010, 2013, 2014 Andrew Novikov</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;.Lucida Grande UI&apos;; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;;&quot;&gt;This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;;&quot;&gt;This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;;&quot;&gt;See &amp;lt;&lt;/span&gt;&lt;a href=&quot;http://www.gnu.org/licenses&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; text-decoration: underline; color:#0000ff;&quot;&gt;http://www.gnu.org/licenses/&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;;&quot;&gt;&amp;gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="appaboutdialog.cpp" line="+18"/>
+        <source>About %1</source>
+        <translation>О программе %1</translation>
+    </message>
+</context>
 <context>
     <name>DBBeagleApplication</name>
     <message>
-        <location filename="main.cpp" line="+26"/>
         <source>Initialization Error</source>
-        <translation>Ошибка инициализации</translation>
+        <translation type="vanished">Ошибка инициализации</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>The database driver &quot;%1&quot; is not available</source>
         <oldsource>Database driver &apos;%1&apos; is not available</oldsource>
-        <translation>Драйвер баз данных &quot;%1&quot; недоступен</translation>
+        <translation type="vanished">Драйвер баз данных &quot;%1&quot; недоступен</translation>
     </message>
 </context>
 <context>
@@ -23,24 +55,29 @@
         <translation>Соединиться с источником данных</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+8"/>
+        <source>Driver:</source>
+        <translation>Драйвер:</translation>
+    </message>
+    <message>
+        <location line="+13"/>
         <source>Host:</source>
-        <translation>Host:</translation>
+        <translation>Сервер:</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Database:</source>
-        <translation>Database:</translation>
+        <translation>БД:</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>User:</source>
-        <translation>User:</translation>
+        <translation>Пользователь:</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Password:</source>
-        <translation>Password:</translation>
+        <translation>Пароль:</translation>
     </message>
 </context>
 <context>
@@ -52,8 +89,8 @@
     </message>
     <message>
         <location line="+27"/>
-        <location filename="mainwindow.cpp" line="+153"/>
-        <location line="+25"/>
+        <location filename="mainwindow.cpp" line="+178"/>
+        <location line="+22"/>
         <location line="+18"/>
         <location line="+9"/>
         <source>Search</source>
@@ -111,7 +148,12 @@
         <translation>&amp;Правка</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+6"/>
+        <source>&amp;Help</source>
+        <translation>Справ&amp;ка</translation>
+    </message>
+    <message>
+        <location line="+10"/>
         <source>Main Toolbar</source>
         <translation>Главная панель инструментов</translation>
     </message>
@@ -167,16 +209,21 @@
         <translation>Ctrl+Shift+F</translation>
     </message>
     <message>
+        <location line="+5"/>
+        <source>&amp;About DBBeagle...</source>
+        <translation>О программе DBBeagle...</translation>
+    </message>
+    <message>
         <source>Search in found</source>
         <translation type="obsolete">Искать в найденном</translation>
     </message>
     <message>
-        <location line="-3"/>
+        <location line="-8"/>
         <source>Use found table names as search criteria</source>
         <translation>Использовать в качестве критериев поиска найденные имена таблиц</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="-113"/>
+        <location filename="mainwindow.cpp" line="-120"/>
         <source>Connection Error</source>
         <translation>Ошибка соединения</translation>
     </message>
@@ -192,7 +239,7 @@ Reason: &quot;%1&quot;.</source>
         <translation>Установлено соединение с %1</translation>
     </message>
     <message>
-        <location line="+38"/>
+        <location line="+45"/>
         <source>Usage information</source>
         <translation>Информация об использовании</translation>
     </message>
@@ -202,7 +249,7 @@ Reason: &quot;%1&quot;.</source>
         <translation>Вы не определили множество таблиц для поиска. Пожалуйста, введите список имен таблиц, разделенных запятой, либо используйте знак &apos;*&apos; для обозначения всех таблиц.</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+18"/>
         <source>The database does not contain any tables.</source>
         <translation>База данных не содержит ни одной таблицы.</translation>
     </message>
@@ -211,14 +258,19 @@ Reason: &quot;%1&quot;.</source>
         <translation type="obsolete">База данных не содержит таблицы с названием &quot;%1&quot;.</translation>
     </message>
     <message>
-        <location line="-61"/>
+        <location line="-71"/>
         <source>Could not connect to the datasource.
 The reason was: &quot;%1&quot;.</source>
         <translation>Невозможно подключиться к источнику.
 Причина: &quot;%1&quot;.</translation>
     </message>
     <message>
-        <location line="+86"/>
+        <location line="+58"/>
+        <source>Available tables:</source>
+        <translation>Доступные таблицы:</translation>
+    </message>
+    <message>
+        <location line="+35"/>
         <source>The database does not contain a table named &quot;%1&quot;.</source>
         <translation>База данных не содержит таблицы с названием &quot;%1&quot;.</translation>
     </message>
@@ -253,7 +305,7 @@ The reason was: &quot;%1&quot;.</source>
         <translation>запрос был &quot;%1&quot;</translation>
     </message>
     <message>
-        <location line="+32"/>
+        <location line="+42"/>
         <source>Failed to prepare the query &quot;%1&quot;.</source>
         <translation>Не удалось подготовить запрос &quot;%1&quot;.</translation>
     </message>
@@ -263,7 +315,7 @@ The reason was: &quot;%1&quot;.</source>
         <translation>Не удалось выполнить запрос &quot;%1&quot;.</translation>
     </message>
     <message>
-        <location line="+43"/>
+        <location line="+48"/>
         <source>Error while executing the query:
 &quot;%1&quot;.</source>
         <translation>Ошибка во время выполнения запроса:
@@ -274,7 +326,7 @@ The reason was: &quot;%1&quot;.</source>
         <translation type="obsolete">запрос был &quot;%1&quot;</translation>
     </message>
     <message>
-        <location line="-67"/>
+        <location line="-82"/>
         <source>No fields in %1 match the type of the value.</source>
         <translation>Ни одно поле в %1 не удовлетворяет типу величины.</translation>
     </message>
@@ -287,12 +339,12 @@ The reason was: &quot;%1&quot;.</source>
         <translation type="obsolete">Не удалось выполнить запрос &quot;%1&quot;.</translation>
     </message>
     <message>
-        <location line="+29"/>
+        <location line="+39"/>
         <source>Found %1 in %2</source>
         <translation>Найдено %1 в %2</translation>
     </message>
     <message>
-        <location line="+37"/>
+        <location line="+42"/>
         <source>SQL Query</source>
         <translation>SQL запрос</translation>
     </message>
@@ -306,14 +358,14 @@ The reason was: &quot;%1&quot;.</source>
 <context>
     <name>SearchResultsTableModel</name>
     <message>
-        <location line="+92"/>
+        <location line="+91"/>
         <source>Table</source>
         <translation>Таблица</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Columns</source>
-        <translation>Колонки</translation>
+        <translation>Столбцы</translation>
     </message>
 </context>
 </TS>
