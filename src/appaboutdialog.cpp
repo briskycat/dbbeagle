@@ -17,7 +17,7 @@ AppAboutDialog::AppAboutDialog(QWidget *parent) :
 
     this->setWindowTitle(tr("About %1").arg(APP_NAME));
     ui->appNameLabel->setText(ui->appNameLabel->text().arg(APP_NAME));
-    ui->appVersionLabel->setText(ui->appVersionLabel->text().arg(APP_VERSION, QDateTime::fromTime_t(APP_TIME).toString("yyyy-MM-dd HH:MM")));
+    ui->appVersionLabel->setText(ui->appVersionLabel->text().arg(APP_VERSION, QDateTime::fromSecsSinceEpoch(APP_TIME).toString("yyyy-MM-dd HH:MM")));
 }
 
 AppAboutDialog::~AppAboutDialog()

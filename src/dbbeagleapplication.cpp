@@ -31,7 +31,7 @@ void DBBeagleApplication::initialize_()
     setApplicationName("DBBeagle");
 
     qtTranslator_.load("qt_" + QLocale::system().name(),
-                      QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+                      QLibraryInfo::path(QLibraryInfo::TranslationsPath));
     installTranslator(&qtTranslator_);
 
     appTranslator_.load("dbbeagle_" + QLocale::system().name());

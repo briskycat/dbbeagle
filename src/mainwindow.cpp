@@ -165,7 +165,7 @@ void MainWindow::search_()
 
     qDebug() << tr("Available tables:");
     QSet<QString> availableTables;
-    for (QString str : DBBeagleApplication::instance().qsqlDb.tables()) {
+    for (const QString& str : DBBeagleApplication::instance().qsqlDb.tables()) {
         availableTables.insert(str.toLower());
         qDebug() << str;
     }
@@ -183,16 +183,15 @@ void MainWindow::search_()
     }
 
     QSet<QString> tablesToSearch;
+    static const QRegularExpression tableListRe("\\s*\\,\\s*");
 
     if (!excludeTablesCheckBox->isChecked()) {
         if (tablesLineEdit->text() == "*") {
             tablesToSearch = availableTables;
         } else {
-            tablesToSearch =
-                    QSet<QString>::fromList(
-                            tablesLineEdit->text().toLower().split(QRegExp("\\s*\\,\\s*"), QString::SkipEmptyParts)
-                            );
-            for (QString str : tablesToSearch)
+            auto tblList = tablesLineEdit->text().toLower().split(tableListRe, Qt::SkipEmptyParts);
+            tablesToSearch = QSet<QString>(tblList.begin(), tblList.end());
+            for (const QString& str : tablesToSearch)
             {
                 if (!availableTables.contains(str))
                 {
@@ -205,10 +204,8 @@ void MainWindow::search_()
             }
         }
     } else {
-        QSet<QString> tablesToExclude =
-                QSet<QString>::fromList(
-                        tablesLineEdit->text().toLower().split(QRegExp("\\s*\\,\\s*"), QString::SkipEmptyParts)
-                        );
+        auto tblList = tablesLineEdit->text().toLower().split(tableListRe, Qt::SkipEmptyParts);
+        QSet<QString> tablesToExclude = QSet<QString>(tblList.begin(), tblList.end());
         tablesToSearch = availableTables - tablesToExclude;
     }
 
@@ -257,8 +254,8 @@ void MainWindow::search_()
         {
             QVariant val(valueLineEdit->text());
             QVariant defVal(QString(""));
-            defVal.convert(rec.field(i).type());
-            val.convert(rec.field(i).type());
+            defVal.convert(rec.field(i).metaType());
+            val.convert(rec.field(i).metaType());
             if (val == defVal && val.toString() != valueLineEdit->text())
             {
                 rec.remove(i);
@@ -278,7 +275,7 @@ void MainWindow::search_()
             QSqlField field = rec.field(i);
 
             // Skip CLOBs, BLOBs and unknown types
-            if(field.type() == QVariant::Invalid || field.type() == QVariant::ByteArray)
+            if(field.metaType().id() == QMetaType::UnknownType || field.metaType().id() == QMetaType::QByteArray)
                 continue;
 
             if (numberOfconditions++ == 0) {
@@ -302,8 +299,10 @@ void MainWindow::search_()
         }
 
         if (!sqlQuery.exec())
+        {
             qDebug() << tr("Failed to execute the query \"%1\".").arg(sqlQuery.lastQuery());
             qDebug() << sqlQuery.lastError();
+        }
 
         if (sqlQuery.next())
         {
@@ -360,7 +359,7 @@ void MainWindow::copyTableNamesFromResults_()
 {
     QStringList l;
     SearchResultsTableModel::ListOfSearchResultsType rl = searchResults_->list();
-    for (SearchResultsTableModel::SearchResultType p : rl)
+    for (SearchResultsTableModel::SearchResultType& p : rl)
         l.append(p.first);
 
     if (!l.isEmpty())
@@ -380,7 +379,7 @@ bool MainWindow::eventFilter(QObject *object, QEvent *event)
 
             QStringList sl;
             QModelIndexList idxList = tv->selectionModel()->selectedIndexes();
-            QModelIndexList::const_iterator idxI= idxList.begin();
+            QModelIndexList::const_iterator idxI= idxList.cbegin();
             for (int i = 0; idxI != idxList.end() && i < 100; i++, idxI++) {
                 sl.append(idxI->data().toString());
             }
@@ -493,7 +492,7 @@ SearchResultsTableModel::ListOfSearchResultsType SearchResultsTableModel::list()
 ////////////////////////////////////////////////////////////////////////////////
 QString	QueryViewItemDelegate::displayText(const QVariant& value, const QLocale& locale) const
 {
-    switch (value.type())
+    switch (value.metaType().id())
     {
     case QMetaType::Double:
         return locale.toString(value.toDouble(), 'g', 96);
