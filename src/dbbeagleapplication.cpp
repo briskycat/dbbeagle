@@ -31,14 +31,16 @@ void DBBeagleApplication::initialize_()
     setOrganizationName("DBBeagle");
     setApplicationName("DBBeagle");
 
-    if (!qtTranslator_.load("qt_" + QLocale::system().name(),
+    const QString localeName = QLocale::system().name();
+
+    if (!qtTranslator_.load("qt_" + localeName,
                             QLibraryInfo::path(QLibraryInfo::TranslationsPath)))
     {
         std::cerr << "Failed to load Qt translation file" << std::endl;
     }
     installTranslator(&qtTranslator_);
 
-    if (!appTranslator_.load("dbbeagle_" + QLocale::system().name()))
+    if (!appTranslator_.load("dbbeagle_" + localeName))
     {
         std::cerr << "Failed to load application translation file" << std::endl;
     }
