@@ -2,6 +2,7 @@
 #include "mainwindow.h"
 
 #include <QLibraryInfo>
+#include <iostream>
 
 DBBeagleApplication* DBBeagleApplication::app_ = nullptr;
 
@@ -30,11 +31,17 @@ void DBBeagleApplication::initialize_()
     setOrganizationName("DBBeagle");
     setApplicationName("DBBeagle");
 
-    qtTranslator_.load("qt_" + QLocale::system().name(),
-                      QLibraryInfo::path(QLibraryInfo::TranslationsPath));
+    if (!qtTranslator_.load("qt_" + QLocale::system().name(),
+                            QLibraryInfo::path(QLibraryInfo::TranslationsPath)))
+    {
+        std::cerr << "Failed to load Qt translation file" << std::endl;
+    }
     installTranslator(&qtTranslator_);
 
-    appTranslator_.load("dbbeagle_" + QLocale::system().name());
+    if (!appTranslator_.load("dbbeagle_" + QLocale::system().name()))
+    {
+        std::cerr << "Failed to load application translation file" << std::endl;
+    }
     installTranslator(&appTranslator_);
 
     mainWindow_.reset(new MainWindow());
