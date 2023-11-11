@@ -48,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(aboutAction, SIGNAL(triggered()), SLOT(showAboutApp()));
 
     connect(searchPushButton, SIGNAL(clicked()), SLOT(search_()));
-    connect(searchResultsTableView, SIGNAL(doubleClicked(const QModelIndex& )), SLOT(resultsItemActivated_(const QModelIndex&)));
+    connect(searchResultsTableView, SIGNAL(doubleClicked(QModelIndex)), SLOT(resultsItemActivated_(QModelIndex)));
 
     connect(searchInFoundAction, SIGNAL(triggered()), SLOT(copyTableNamesFromResults_()));
 
@@ -71,7 +71,7 @@ void MainWindow::connectToDB_()
 {
     QStringList availableDrivers = QSqlDatabase::drivers(), supportedDrivers;
 
-    for(QString driver : availableDrivers) {
+    for(const QString& driver : availableDrivers) {
         if (dialectAdaptors_.find(driver.toStdString()) == dialectAdaptors_.end())
             continue;
         supportedDrivers.push_back(driver);
@@ -191,7 +191,7 @@ void MainWindow::search_()
         } else {
             auto tblList = tablesLineEdit->text().toLower().split(tableListRe, Qt::SkipEmptyParts);
             tablesToSearch = QSet<QString>(tblList.begin(), tblList.end());
-            for (const QString& str : tablesToSearch)
+            for (const QString& str : std::as_const(tablesToSearch))
             {
                 if (!availableTables.contains(str))
                 {
@@ -232,7 +232,7 @@ void MainWindow::search_()
     QProgressDialog progress(tr("Searching..."), tr("Abort Search"), 0, tablesToSearch.count(), this);
     progress.setWindowModality(Qt::WindowModal);
     int searchCount = 0;
-    for (QString curTable : tablesToSearch)
+    for (const QString& curTable : std::as_const(tablesToSearch))
     {
         progress.setValue(searchCount);
         if (progress.wasCanceled())
