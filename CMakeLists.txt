@@ -148,6 +148,7 @@ endif()
 # Translations
 qt_add_translations(${PROJECT_NAME}
     TS_FILES src/dbbeagle_ru.ts
+    QM_FILES_OUTPUT_VARIABLE QM_FILES
 )
 
 # Installation rules
@@ -156,6 +157,21 @@ install(TARGETS ${PROJECT_NAME}
     BUNDLE DESTINATION .
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
+
+# Install translation files
+if(APPLE)
+    # For macOS, install inside the bundle
+    install(FILES ${QM_FILES} 
+            DESTINATION "${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app/Contents/Resources/translations")
+elseif(WIN32)
+    # For Windows, install alongside the executable
+    install(FILES ${QM_FILES} 
+            DESTINATION ${CMAKE_INSTALL_BINDIR}/translations)
+else()
+    # For Linux/Unix, install to standard data directory
+    install(FILES ${QM_FILES} 
+            DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/translations)
+endif()
 
 # Packaging with CPack
 include(CPack)
