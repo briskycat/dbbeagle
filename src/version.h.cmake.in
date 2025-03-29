@@ -1,0 +1,24 @@
+#ifndef VERSION_H
+#define VERSION_H
+
+/* tag fomat: v1.2.3 */
+
+#define GIT_VERSION      "@GIT_VERSION@"
+#define GIT_TIMESTAMP    @GIT_TIMESTAMP@
+
+#define APP_MAJOR        @APP_MAJOR@
+#define APP_MINOR        @APP_MINOR@
+#define APP_PATCH        @APP_PATCH@
+
+#define APP_VERSION      "@APP_VERSION@"
+
+#define APP_NAME         "@PROJECT_NAME@"
+#define APP_TIME         @GIT_TIMESTAMP@
+
+/*
+#define APP_VERSION_RC   @APP_VERSION_RC@
+#define APP_BUILD        @APP_BUILD@
+#define APP_REVISION     "@APP_REVISION@"
+*/
+
+#endif /* VERSION_H */
